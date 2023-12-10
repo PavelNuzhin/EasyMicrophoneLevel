@@ -129,7 +129,7 @@ public class EasyMicrophoneLevelApp
         {
             _infoWindow = new MicVolumeInfoWidow();
         }
-        _infoWindow.ShowVolumeInfo((int)(_micManager.Volume * 100));
+        _infoWindow.ShowVolumeInfo(_micManager.Device.DeviceFriendlyName, (int)(_micManager.Volume * 100));
     }
 
     protected void Close()

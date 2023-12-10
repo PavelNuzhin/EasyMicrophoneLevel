@@ -40,9 +40,9 @@ public class MicVolumeInfoWidow : Window
         Dispatcher.Invoke(Close);
     }
 
-    internal void ShowVolumeInfo(int volume)
+    internal void ShowVolumeInfo(string deviceName, int volume)
     {
-        Content = new TextBlock() { Text = $"Microphone volume: {volume}", FontSize = 20, Foreground = System.Windows.Media.Brushes.Red, HorizontalAlignment = System.Windows.HorizontalAlignment.Center };
+        Content = new TextBlock() { Text = $"{deviceName}: {volume}", FontSize = 20, Foreground = System.Windows.Media.Brushes.Red, HorizontalAlignment = System.Windows.HorizontalAlignment.Center };
         ShowForSeconds(3);
     }
 }
