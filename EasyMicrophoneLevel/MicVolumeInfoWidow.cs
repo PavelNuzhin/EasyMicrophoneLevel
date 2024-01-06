@@ -3,10 +3,10 @@ using System.Windows.Controls;
 
 public class MicVolumeInfoWidow : Window
 {
-    private bool _closed = false;
+    private bool _hidden = false;
     private CancellationTokenSource _cancelClosing = new CancellationTokenSource();
 
-    public bool InfoHidden => _closed;
+    public bool InfoHidden => _hidden;
     public MicVolumeInfoWidow()
     {
         WindowStyle = WindowStyle.None;
@@ -20,7 +20,7 @@ public class MicVolumeInfoWidow : Window
 
     protected override void OnClosed(EventArgs e)
     {
-        _closed = true;
+        _hidden = true;
         base.OnClosed(e);
     }
 

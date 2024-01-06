@@ -2,6 +2,7 @@
 using NAudio.CoreAudioApi;
 using System.IO;
 using System.Reflection;
+using System.Windows.Threading;
 using WindowsHookEx;
 
 public class EasyMicrophoneLevelApp
@@ -32,30 +33,23 @@ public class EasyMicrophoneLevelApp
 
     public EasyMicrophoneLevelApp()
     {
-        var device = GetCapturingDeviceFromConfig();
-        _micManager = new MicrophoneManager(device);
-
+        var deviceName = GetCapturingDeviceNameFromConfig();
+        _micManager = new MicrophoneManager(deviceName);
+        
         SetNotifyIcon();
         SubscribeToHotKeys();
     }
 
-    private MMDevice GetCapturingDeviceFromConfig()
+    private string? GetCapturingDeviceNameFromConfig()
     {
         if (!AppConfiguration.Contains(_captureDeviceParameterName))
         {
-            return MicrophoneManager.GetDefaultCaptureDevice();
+            return null;
         }
 
         var deviceName = AppConfiguration.Get(_captureDeviceParameterName);
 
-        try
-        {
-            return MicrophoneManager.GetCaptureDevice(deviceName);
-        }
-        catch
-        {
-            return MicrophoneManager.GetDefaultCaptureDevice();
-        }
+        return deviceName;
     }
 
     private void SetNotifyIcon()
@@ -92,34 +86,30 @@ public class EasyMicrophoneLevelApp
     private void FillDeviceList()
     {
         _devicesList.Items.Clear();
-        foreach (var device in MicrophoneManager.GetCaptureDevices())
+        foreach (var device in MicrophoneManager.GetCaptureDeviceNames())
         {
-            _devicesList.Items.Add(
-                device.DeviceFriendlyName,
+            var item = new ToolStripButton(
+                device,
                 null,
                 (sender, args) =>
                 {
-                    _micManager.Device = device;
-                    SetCaptureDevice(device.DeviceFriendlyName);
+                    _micManager.SetDevice(device);
+                    SetCaptureDevice(device);
                 });
-        }
 
-        SetCaptureDevice(_micManager.Device.DeviceFriendlyName);
+            if (device == _micManager.DeviceName)
+            {
+                item.ForeColor = Color.Red;
+            }
+            _devicesList.Items.Add(item);
+        }
     }
 
     private void SetCaptureDevice(string deviceName)
     {
-        if(_captureDeviceParameterName != deviceName)
+        if(AppConfiguration.Get(_captureDeviceParameterName) != deviceName)
         {
             AppConfiguration.Set(_captureDeviceParameterName, deviceName);
-        }
-        
-        foreach (ToolStripItem item in _devicesList.Items)
-        {
-            if(item.Text == deviceName)
-            {
-                item.ForeColor = item.Text == deviceName ? Color.Red : Color.Black;
-            }
         }
     }
 
@@ -129,7 +119,7 @@ public class EasyMicrophoneLevelApp
         {
             _infoWindow = new MicVolumeInfoWidow();
         }
-        _infoWindow.ShowVolumeInfo(_micManager.Device.DeviceFriendlyName, (int)(_micManager.Volume * 100));
+        _infoWindow.ShowVolumeInfo(_micManager.DeviceName, (int)(_micManager.Volume * 100));
     }
 
     protected void Close()
