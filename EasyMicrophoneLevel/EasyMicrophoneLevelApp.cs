@@ -1,8 +1,6 @@
 ﻿using MicLevel;
-using NAudio.CoreAudioApi;
 using System.IO;
 using System.Reflection;
-using System.Windows.Threading;
 using WindowsHookEx;
 
 public class EasyMicrophoneLevelApp
@@ -34,6 +32,12 @@ public class EasyMicrophoneLevelApp
     public EasyMicrophoneLevelApp()
     {
         var deviceName = GetCapturingDeviceNameFromConfig();
+        
+        if(deviceName is null)
+        {
+            deviceName = MicrophoneManager.GetDefaultCaptureDeviceName();
+        }
+
         _micManager = new MicrophoneManager(deviceName);
         
         SetNotifyIcon();

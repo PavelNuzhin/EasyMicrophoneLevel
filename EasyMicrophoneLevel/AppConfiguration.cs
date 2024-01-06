@@ -1,5 +1,4 @@
 ﻿using System.Configuration;
-using System.Windows.Input;
 
 internal class AppConfiguration
 {
